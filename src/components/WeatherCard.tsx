@@ -1,8 +1,7 @@
-// components/WeatherCard.tsx
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { WeatherCardProps } from "../../types/cuaca";
 // 1. Tambahkan baris import ini untuk memanggil variabel dari styles.ts
-import { spacing } from "../constants/styles";
+import { spacing, typeScale } from "../constants/styles";
 export default function WeatherCard({
   kota,
   suhu,
@@ -13,15 +12,22 @@ export default function WeatherCard({
     // 2. Ganti angka padding menjadi spacing.sedang
     <View
       accessible
-      accessibilityLabel={`Cuaca ${kota}, suhu ${suhu} derajat, kualitas udara
-    ${tingkatAQI}`}
+      accessibilityLabel={`Cuaca ${kota}, suhu ${suhu} derajat, kualitas udara ${tingkatAQI}`}
       style={{
         padding: spacing.sedang,
         borderRadius: 8,
         backgroundColor: "#F4F7FA",
       }}
     >
-      {/* isi WeatherCard tetap seperti sebelumnya */}
+      {/* 3. Ganti angka fontSize menjadi typeScale */}
+      <Text style={{ fontWeight: "bold", fontSize: typeScale.judul }}>
+        {kota}
+      </Text>
+      <Text style={{ fontSize: 32 }}>{suhu}°C</Text>
+      <Text style={{ color: warnaAQI, fontSize: typeScale.isi }}>
+        AQI:
+        {tingkatAQI}
+      </Text>
     </View>
   );
 }
