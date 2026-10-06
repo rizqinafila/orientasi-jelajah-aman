@@ -1,5 +1,5 @@
+import { router } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { mintaIzinLokasi, ambilKoordinatSaatIni } from "../../services/locationService";
 import {
   ActivityIndicator,
   Button,
@@ -16,6 +16,10 @@ import WeatherCard from "../../components/WeatherCard";
 import { useDebounce } from "../../hooks/use-debounce";
 import { ambilKualitasUdara } from "../../services/airQualityService";
 import { cariKota } from "../../services/geocodingService";
+import {
+  ambilKoordinatSaatIni,
+  mintaIzinLokasi,
+} from "../../services/locationService";
 import { konversiTingkatAQI } from "../../services/weatherAdapter";
 import { ambilCuaca } from "../../services/weatherService";
 export default function HalamanUtama() {
@@ -63,11 +67,15 @@ export default function HalamanUtama() {
   async function gunakanLokasiSaatIni() {
     const status = await mintaIzinLokasi();
     if (status === "denied") {
-      setPesanLokasi("Izin lokasi ditolak. Silakan cari kota secara manual di atas.");
+      setPesanLokasi(
+        "Izin lokasi ditolak. Silakan cari kota secara manual di atas.",
+      );
       return;
     }
     if (status === "unavailable") {
-      setPesanLokasi("Layanan lokasi tidak aktif di perangkat ini. Silakan cari kota secara manual.");
+      setPesanLokasi(
+        "Layanan lokasi tidak aktif di perangkat ini. Silakan cari kota secara manual.",
+      );
       return;
     }
     setPesanLokasi(null);
@@ -101,12 +109,27 @@ export default function HalamanUtama() {
         </View>
       )}
       {cuaca && kualitasUdara && kotaTerpilih && !sedangMemuat && (
-        <WeatherCard
-          kota={kotaTerpilih.name}
-          suhu={cuaca.saatIni.suhu}
-          tingkatAQI={konversiTingkatAQI(kualitasUdara.indeksAQI)}
-          indeksAQI={kualitasUdara.indeksAQI}
-        />
+        <>
+          <WeatherCard
+            kota={kotaTerpilih.name}
+            suhu={cuaca.saatIni.suhu}
+            tingkatAQI={konversiTingkatAQI(kualitasUdara.indeksAQI)}
+          />
+          <Button
+            title="Tambahkan ke Favorit"
+            onPress={() =>
+              router.push({
+                pathname: "/tambah-favorit",
+                params: {
+                  id: String(kotaTerpilih.id),
+                  nama: kotaTerpilih.name,
+                  lat: String(kotaTerpilih.latitude),
+                  lon: String(kotaTerpilih.longitude),
+                },
+              })
+            }
+          />
+        </>
       )}
       {cuaca && !sedangMemuat && (
         <Text style={{ fontSize: 14 }}>
