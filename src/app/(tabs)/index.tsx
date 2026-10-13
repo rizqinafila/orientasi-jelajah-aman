@@ -1,5 +1,5 @@
-import { router } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { router, useFocusEffect } from "expo-router";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Button,
@@ -8,6 +8,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { KotaFavorit } from "../../../types/favorit";
 import { HasilGeocoding } from "../../../types/geocoding";
 import { DataCuacaLengkap, DataKualitasUdara } from "../../../types/weather";
 import AtribusiCuaca from "../../components/AtribusiCuaca";
@@ -15,14 +16,17 @@ import SearchBox from "../../components/SearchBox";
 import WeatherCard from "../../components/WeatherCard";
 import { useDebounce } from "../../hooks/use-debounce";
 import { ambilKualitasUdara } from "../../services/airQualityService";
+import { ambilSemuaFavorit } from "../../services/favoritStorage";
 import { cariKota } from "../../services/geocodingService";
 import {
   ambilKoordinatSaatIni,
   mintaIzinLokasi,
 } from "../../services/locationService";
+
 import { konversiTingkatAQI } from "../../services/weatherAdapter";
 import { ambilCuaca } from "../../services/weatherService";
 export default function HalamanUtama() {
+  const [daftarFavorit, setDaftarFavorit] = useState<KotaFavorit[]>([]);
   const [teksCari, setTeksCari] = useState("");
   const [hasilPencarian, setHasilPencarian] = useState<HasilGeocoding[]>([]);
   const [kotaTerpilih, setKotaTerpilih] = useState<HasilGeocoding | null>(null);
@@ -35,6 +39,17 @@ export default function HalamanUtama() {
   const [pesanLokasi, setPesanLokasi] = useState<string | null>(null);
   const teksTertunda = useDebounce(teksCari, 500);
   const requestIdRef = useRef(0); // pencegah race condition
+
+  useFocusEffect(
+    useCallback(() => {
+      ambilSemuaFavorit().then(setDaftarFavorit);
+    }, []),
+  );
+
+  const sudahFavorit = kotaTerpilih
+    ? daftarFavorit.some((k) => k.id === kotaTerpilih.id)
+    : false;
+
   useEffect(() => {
     if (teksTertunda.trim().length === 0) {
       setHasilPencarian([]);
@@ -114,9 +129,11 @@ export default function HalamanUtama() {
             kota={kotaTerpilih.name}
             suhu={cuaca.saatIni.suhu}
             tingkatAQI={konversiTingkatAQI(kualitasUdara.indeksAQI)}
+            indeksAQI={kualitasUdara.indeksAQI}
           />
           <Button
             title="Tambahkan ke Favorit"
+            disabled={sudahFavorit}
             onPress={() =>
               router.push({
                 pathname: "/tambah-favorit",
