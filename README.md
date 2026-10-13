@@ -54,3 +54,11 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Dokumentasi Status Data & Mode Offline (Pertemuan 7)
+
+- **Cache-Segar**: Kondisi ketika data cuaca dan kualitas udara diambil dari cache lokal SQLite dan umurnya masih di bawah batas TTL (kurang dari 30 menit), sehingga aplikasi langsung menampilkannya secara instan tanpa perlu memanggil API internet.
+- **Cache-Basi (Stale)**: Kondisi ketika umur data cache sudah melebihi batas TTL 30 menit dan perangkat sedang offline atau gagal menghubungi API internet; aplikasi tetap menampilkan data terakhir yang tersimpan dengan indikator oranye yang jujur bahwa data mungkin sudah usang.
+- **First-Run Offline**: Kondisi ketika aplikasi dijalankan saat tidak ada koneksi internet dan belum pernah ada data yang tersimpan sebelumnya di SQLite untuk lokasi tersebut, sehingga aplikasi menampilkan pesan error informatif disertai tombol "Coba Lagi" tanpa mengalami crash.
+- **Urgensi Label Status Data**: Label status data sangat penting bagi pengguna untuk menjaga transparansi dan kepercayaan, karena pengguna berhak mengetahui secara pasti apakah informasi cuaca dan kualitas udara yang ditampilkan adalah data terbaru dari internet atau sekadar data historis saat jaringan tidak tersedia.
+
